@@ -1,4 +1,4 @@
-# the simple archtecture
+# the simple architecture
 
 based on: https://dev.to/hugaomarques/a-arquitetura-simples-lb
 
