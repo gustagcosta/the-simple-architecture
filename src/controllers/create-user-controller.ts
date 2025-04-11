@@ -21,8 +21,10 @@ export class CreateUserController {
 
     const createUserUseCase = new CreateUserUseCase();
 
-    const userId = await createUserUseCase.execute(user);
+    const output = await createUserUseCase.execute(user);
 
-    console.log('User created', { userId });
+    console.log('User created', { output });
+
+    return output;
   }
 }

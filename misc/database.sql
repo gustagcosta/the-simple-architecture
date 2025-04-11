@@ -14,7 +14,7 @@ CREATE TABLE payments (
   payer_id INT NOT NULL,
   payee_id INT NOT NULL,
   value INT NOT NULL,
-  status ENUM('approved', 'unpaid', 'confirmed', 'canceled') NOT NULL,
+  status ENUM('waiting', 'confirmed', 'canceled') NOT NULL,
   date DATETIME NOT NULL,
   FOREIGN KEY (payer_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (payee_id) REFERENCES users(id) ON DELETE CASCADE

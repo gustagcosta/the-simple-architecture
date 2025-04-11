@@ -4,7 +4,7 @@ dotenv.config();
 import Fastify from 'fastify';
 import { ZodError } from 'zod';
 
-import { CreateUserController } from './controllers/index.js';
+import { CreatePaymentController, CreateUserController } from './controllers/index.js';
 import { ConflictError, ExpectedError, NotAllowedError, NotFoundError } from './shared/index.js';
 
 const fastify = Fastify();
@@ -15,8 +15,17 @@ fastify.get('/', async function handler(request, reply) {
 
 fastify.post('/users', async (request, reply) => {
   try {
-    await CreateUserController.execute(request.body);
-    return reply.code(201).send({ message: 'User created' });
+    const response = await CreateUserController.execute(request.body);
+    return reply.code(201).send(response);
+  } catch (error) {
+    handleError(error, reply);
+  }
+});
+
+fastify.post('/payments', async (request, reply) => {
+  try {
+    const response = await CreatePaymentController.execute(request.body);
+    return reply.code(201).send(response);
   } catch (error) {
     handleError(error, reply);
   }

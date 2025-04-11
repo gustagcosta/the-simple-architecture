@@ -3,12 +3,12 @@ export class Payment {
   public payer_id: number;
   public payee_id: number;
   public value: number;
-  public status: PaymentStatus;
-  public date: Date;
+  public status?: PaymentStatus;
+  public date?: Date;
 }
 
 export enum PaymentStatus {
-  'waiting',
-  'confirmed',
-  'canceled'
+  waiting = 'waiting',
+  confirmed = 'confirmed',
+  canceled = 'canceled'
 }
