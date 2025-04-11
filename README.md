@@ -54,7 +54,8 @@ create users
 
 create payment
   - save payment in database
-  - put on confirmation queue
+  - approve or reprove
+  - put on confirmation or cancellation queue
 
 create a cancellation
   - put on cancellation queue
@@ -62,6 +63,7 @@ create a cancellation
 confirmation
   - async
   - create transactions
+  - edit payment
   - calculate balance
   - update cache with the balance
 
