@@ -40,7 +40,7 @@ KISS - keep it super simple xD
 
 ### persistence
 
-- class where will concentrate your database operations
+- classes where will concentrate your database operations
 
 ### config
 
