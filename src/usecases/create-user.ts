@@ -1,5 +1,4 @@
-import { container } from '../config/container.js';
-import { IUserRepository } from '../database/repositories/index.js';
+import { IUserRepository } from '../repositories/index.js';
 import { User } from '../entities/index.js';
 import { ExpectedError } from '../shared/errors.js';
 
@@ -8,11 +7,7 @@ export interface CreateUserOutput {
 }
 
 export class CreateUserUseCase {
-  private userRepository: IUserRepository;
-
-  constructor() {
-    this.userRepository = container.resolve('userRepository');
-  }
+  constructor(private userRepository: IUserRepository) {}
 
   public async execute(user: User): Promise<CreateUserOutput> {
     if (!this.nameIsValid(user.name)) {

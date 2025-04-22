@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { User } from '../entities/index.js';
 import { CreateUserUseCase } from '../usecases/create-user.js';
+import { container } from '../config/container.js';
 
 const createUserSchema = z.object({
   name: z.string().min(3),
@@ -19,7 +20,7 @@ export class CreateUserController {
     user.email = createUserInput.email;
     user.password = createUserInput.password;
 
-    const createUserUseCase = new CreateUserUseCase();
+    const createUserUseCase = new CreateUserUseCase(container.resolve('userRepository'));
 
     const output = await createUserUseCase.execute(user);
 
