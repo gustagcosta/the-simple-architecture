@@ -1,41 +1,60 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { randomUUID } from 'crypto';
 import { createContainer, asClass, AwilixContainer, asValue } from 'awilix';
 import mysql from 'mysql2/promise';
 import { Redis } from 'ioredis';
 
-import {
-  IPaymentRepository,
-  IUserRepository,
-  PaymentRepository,
-  UserRepository
-} from '../repositories/index.js';
+import { IPaymentRepository, IUserRepository, PaymentRepository, UserRepository } from '../repositories/index.js';
+import { IMessageService, IPaymentGateway, MessageService, PaymentGateway } from '../external/index.js';
+import { CreatePaymentController, CreateUserController } from '../controllers/index.js';
+import { CreatePaymentUseCase, CreateUserUseCase } from '../usecases/index.js';
 
-import { IPaymentGateway, IMessageService, PaymentGateway, MessageService } from '../external/index.js';
+export type AppContainer = {
+  uuid: string;
 
-const redisConnection = await setupRedisConnection();
-const mysqlConnection = await setupMysqlConnection();
-
-type AppContainer = {
   mysqlConnection: mysql.Connection;
   redisConnection: Redis;
+
   userRepository: IUserRepository;
   paymentRepository: IPaymentRepository;
+
   paymentGateway: IPaymentGateway;
+
   messageService: IMessageService;
+
+  createPaymentController: CreatePaymentController;
+  createUserController: CreateUserController;
+
+  createPaymentUseCase: CreatePaymentUseCase;
+  createUserUseCase: CreateUserUseCase;
 };
 
-const container: AwilixContainer<AppContainer> = createContainer<AppContainer>();
+export async function setupContainer() {
+  const redisConnection = await setupRedisConnection();
+  const mysqlConnection = await setupMysqlConnection();
 
-container.register({
-  mysqlConnection: asValue(mysqlConnection),
-  redisConnection: asValue(redisConnection),
-  userRepository: asClass(UserRepository).singleton(),
-  paymentRepository: asClass(PaymentRepository).singleton(),
-  paymentGateway: asClass(PaymentGateway).singleton(),
-  messageService: asClass(MessageService).singleton()
-});
+  const container: AwilixContainer<AppContainer> = createContainer<AppContainer>();
+
+  container.register({
+    uuid: asValue(randomUUID()),
+    mysqlConnection: asValue(mysqlConnection),
+    redisConnection: asValue(redisConnection),
+    userRepository: asClass(UserRepository).scoped(),
+    paymentRepository: asClass(PaymentRepository).scoped(),
+    paymentGateway: asClass(PaymentGateway).scoped(),
+    messageService: asClass(MessageService).scoped(),
+    createPaymentController: asClass(CreatePaymentController).scoped(),
+    createUserController: asClass(CreateUserController).scoped(),
+    createPaymentUseCase: asClass(CreatePaymentUseCase).scoped(),
+    createUserUseCase: asClass(CreateUserUseCase).scoped()
+  });
+
+  console.log('container created');
+
+  return container;
+}
 
 async function setupMysqlConnection() {
   const db = await mysql.createConnection({
@@ -63,7 +82,3 @@ async function setupRedisConnection() {
 
   return redis;
 }
-
-console.log('container created');
-
-export { container, AppContainer };

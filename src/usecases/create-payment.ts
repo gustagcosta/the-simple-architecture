@@ -1,7 +1,9 @@
 import { IPaymentRepository, IUserRepository } from '../repositories/index.js';
 import { Payment, PaymentStatus } from '../entities/index.js';
-import { IPaymentGateway, IMessageService } from '../external/index.js';
 import { Channel } from '../shared/index.js';
+import { AppContainer } from '../config/container.js';
+import { IPaymentGateway } from '../external/payment-gateway.js';
+import { IMessageService } from '../external/message-service.js';
 
 export interface CreatePaymentOutput {
   payment_id: number;
@@ -9,12 +11,17 @@ export interface CreatePaymentOutput {
 }
 
 export class CreatePaymentUseCase {
-  constructor(
-    private readonly paymentRepository: IPaymentRepository,
-    private readonly paymentGateway: IPaymentGateway,
-    private readonly messageService: IMessageService,
-    private readonly userRepository: IUserRepository
-  ) {}
+  private paymentRepository: IPaymentRepository;
+  private paymentGateway: IPaymentGateway;
+  private messageService: IMessageService;
+  private userRepository: IUserRepository;
+
+  constructor(params: AppContainer) {
+    this.paymentGateway = params.paymentGateway;
+    this.messageService = params.messageService;
+    this.userRepository = params.userRepository;
+    this.paymentRepository = params.paymentRepository;
+  }
 
   public async execute(payment: Payment): Promise<CreatePaymentOutput> {
     await this.userRepository.getById(payment.payee_id);

@@ -1,17 +1,22 @@
 import { IUserRepository } from '../repositories/index.js';
 import { User } from '../entities/index.js';
-import { ExpectedError } from '../shared/errors.js';
+import { ApplicationError, ErrorTypes } from '../shared/errors.js';
+import { AppContainer } from '../config/container.js';
 
 export interface CreateUserOutput {
   user_id: number;
 }
 
 export class CreateUserUseCase {
-  constructor(private userRepository: IUserRepository) {}
+  private userRepository: IUserRepository;
+
+  constructor(params: AppContainer) {
+    this.userRepository = params.userRepository;
+  }
 
   public async execute(user: User): Promise<CreateUserOutput> {
     if (!this.nameIsValid(user.name)) {
-      throw new ExpectedError('Invalid name');
+      throw new ApplicationError('Invalid name', ErrorTypes.ExpectedError);
     }
 
     user.id = await this.userRepository.createAndGetId(user);

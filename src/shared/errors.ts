@@ -1,27 +1,19 @@
-export class ExpectedError extends Error { // 400
-  constructor(message: string) {
-    super(message);
-    this.name = 'ExpectedError';
-  }
+export enum ErrorTypes {
+  ExpectedError = 400,
+  NotAllowedError = 401,
+  NotFoundError = 404,
+  ConflictError = 409,
+  UnprocessableEntityError = 422
 }
 
-export class ConflictError extends Error { // 409
-  constructor(message: string) {
-    super(message);
-    this.name = 'ConflictError';
-  }
-}
+export class ApplicationError extends Error {
+  code: number;
+  extras?: any;
 
-export class NotAllowedError extends Error { // 401
-  constructor(message: string) {
+  constructor(message: string, type: ErrorTypes, extras?: any) {
     super(message);
-    this.name = 'NotAllowedError';
-  }
-}
-
-export class NotFoundError extends Error { // 404
-  constructor(message: string) {
-    super(message);
-    this.name = 'NotFoundError';
+    this.code = type;
+    this.name = ErrorTypes[type];
+    this.extras = extras;
   }
 }

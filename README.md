@@ -21,11 +21,12 @@ KISS - keep it super simple xD
 - transform api input in use case input
 - call use case
 
-### use cases or services
+### use cases
 
 - implement business rules with entities
 - one by api route or correlated
 - handle persistence and external depencies
+- must only depend on interfaces
 
 ### entities
 
@@ -37,15 +38,22 @@ KISS - keep it super simple xD
 - facade or anti corruption layer
 - acts as an intermediary to isolate the domain from external systems
 - ensuring that any changes to the external require modifications only in this class
+- must have a interface and a implementation
+- sometimes will have more than one impletation
 
-### persistence
+### persistence / repositories
 
 - classes where will concentrate your database operations
+- ideally one per entity
+- must have a interface and a implementation
+- can be ORM
 
 ### config
 
 - dependency injection framework
 - will conect everything
+- expose a type with all the classes
+- satisfies the interfaces on use cases with the implementations
 
 # POC
 

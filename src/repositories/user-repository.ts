@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 
 import { User } from '../entities/index.js';
-import { ConflictError, NotFoundError } from '../shared/index.js';
+import { ApplicationError, ErrorTypes } from '../shared/index.js';
 import { AppContainer } from '../config/container.js';
 
 export interface IUserRepository {
@@ -22,7 +22,7 @@ export class UserRepository implements IUserRepository {
       [userId]
     );
 
-    if (rows.length === 0) throw new NotFoundError('User not found');
+    if (rows.length === 0) throw new ApplicationError('User not found', ErrorTypes.NotFoundError);
 
     const [row] = rows;
 
@@ -44,7 +44,7 @@ export class UserRepository implements IUserRepository {
       return result.insertId;
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictError('Email already in use');
+        throw new ApplicationError('Email already in use', ErrorTypes.ConflictError);
       }
 
       throw error;

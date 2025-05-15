@@ -4,52 +4,48 @@ dotenv.config();
 import Fastify from 'fastify';
 import { ZodError } from 'zod';
 
-import { CreatePaymentController, CreateUserController } from './controllers/index.js';
-import { ConflictError, ExpectedError, NotAllowedError, NotFoundError } from './shared/index.js';
+import { ApplicationError } from './shared/index.js';
+import { setupContainer } from './config/container.js';
 
 const fastify = Fastify();
+
+const executeRule = (controllerName: string, responseCode: number) => {
+  return async (request: any, reply: any) => {
+    try {
+      const container = await setupContainer();
+
+      const controller = container.resolve(`${controllerName}Controller`) as any;
+
+      const response = await controller.execute(request.body);
+
+      return reply.code(responseCode).send(response);
+    } catch (error) {
+      handleError(error, reply);
+    }
+  };
+};
 
 fastify.get('/', async function handler(request, reply) {
   return { hello: 'world' };
 });
 
-fastify.post('/users', async (request, reply) => {
-  try {
-    const response = await CreateUserController.execute(request.body);
-    return reply.code(201).send(response);
-  } catch (error) {
-    handleError(error, reply);
-  }
-});
+fastify.post('/users', executeRule('createUser', 201));
 
-fastify.post('/payments', async (request, reply) => {
-  try {
-    const response = await CreatePaymentController.execute(request.body);
-    return reply.code(201).send(response);
-  } catch (error) {
-    handleError(error, reply);
-  }
-});
+fastify.post('/payments', executeRule('createPayment', 201));
 
 const handleError = (error: any, reply: Fastify.FastifyReply) => {
   if (error instanceof ZodError) {
     return reply.code(400).send({ error: error.errors });
   }
 
-  if (error instanceof ExpectedError) {
-    return reply.status(400).send({ success: false, message: error.message });
-  }
+  if (error instanceof ApplicationError) {
+    const response: any = { success: false, message: error.message };
 
-  if (error instanceof ConflictError) {
-    return reply.status(409).send({ success: false, message: error.message });
-  }
+    if (error.extras) {
+      response.extras = error.extras;
+    }
 
-  if (error instanceof NotAllowedError) {
-    return reply.status(401).send({ success: false, message: error.message });
-  }
-
-  if (error instanceof NotFoundError) {
-    return reply.status(404).send({ success: false, message: error.message });
+    return reply.status(error.code).send(response);
   }
 
   console.error({ error });
