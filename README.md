@@ -68,7 +68,7 @@ create payment
 create a cancellation
   - put on cancellation queue
 
-confirmation
+confirmation -> poller queue
   - async
   - create transactions
   - edit payment
@@ -79,3 +79,5 @@ get user by id
   - fetch cached user balance -> last updated must be present
 
 cache and pub sub by Redis
+
+create a external call with xml
